@@ -1,0 +1,19 @@
+{
+  "name": "typescript-comments-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivan-developer-01/typescript-comments-api.git"
+  },
+  "author": "ivan-developer-01",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ivan-developer-01/typescript-comments-api/issues"
+  },
+  "homepage": "https://github.com/ivan-developer-01/typescript-comments-api#readme"
+}
