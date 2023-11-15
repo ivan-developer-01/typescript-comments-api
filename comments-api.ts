@@ -88,6 +88,20 @@ app.post(PATH, async (req: Request<{}, {}, CommentCreatePayload>, res: Response)
 	res.send(`Comment id:${id} has been added!`);
 });
 
+// api/comments/:id
+app.get(`${PATH}/:id`, async (req: Request<{ id: string }>, res: Response) => {
+	const { id } = req.params;
+	const comments = await loadComments();
+	const comment = comments.find(comment => comment.id === id);
+	if (!comment) {
+		res.status(404);
+		res.send(`Comment with id ${id} is not found`);
+		return;
+	}
+
+	res.send(comment);
+});
+
 const PORT = 3000;
 
 app.listen(PORT, () => {
