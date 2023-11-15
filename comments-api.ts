@@ -63,32 +63,37 @@ app.get(PATH, async (req: Request, res: Response) => {
 });
 
 app.post(PATH, async (req: Request<{}, {}, CommentCreatePayload>, res: Response) => {
-	const validationResult = validateComment(req.body);
+	try {
+		const validationResult = validateComment(req.body);
 
-	if (validationResult) {
-		res.status(400);
-		res.send(validationResult);
-		return;
+		if (validationResult) {
+			res.status(400);
+			res.send(validationResult);
+			return;
+		}
+
+		const id = v4();
+		// сохранить новый комментарий в файл
+
+		const comments = await loadComments();
+
+		const isUniq = checkCommentUniq(req.body, comments);
+
+		if (!isUniq) {
+			res.status(422);
+			res.send("Comment with the same fields already exists");
+			return;
+		}
+
+		comments.push({ ...req.body, id });
+		await saveComments(comments);
+
+		res.status(201);
+		res.send(`Comment id:${id} has been added!`);
+	} catch {
+		res.status(500);
+		res.send("Server error. Comment has not been created");
 	}
-
-	const id = v4();
-	// сохранить новый комментарий в файл
-
-	const comments = await loadComments();
-
-	const isUniq = checkCommentUniq(req.body, comments);
-
-	if (!isUniq) {
-		res.status(422);
-		res.send("Comment with the same fields already exists");
-		return;
-	}
-
-	comments.push({ ...req.body, id });
-	await saveComments(comments);
-
-	res.status(201);
-	res.send(`Comment id:${id} has been added!`);
 });
 
 // api/comments/:id
