@@ -18,7 +18,6 @@ const saveComments = async (data: IComment[]): Promise<void> => {
 }
 
 const validateComment = (comment: CommentCreatePayload): string | null => {
-	console.log(comment)
 	switch (true) {
 		case !comment.name:
 			return "Name is required";
@@ -61,7 +60,6 @@ app.get(PATH, async (req: Request, res: Response) => {
 });
 
 app.post(PATH, async (req: Request<{}, {}, CommentCreatePayload>, res: Response) => {
-	console.log(req.body, req);
 	const validationResult = validateComment(req.body);
 
 	if (validationResult) {
