@@ -19,14 +19,17 @@ const saveComments = async (data: IComment[]): Promise<void> => {
 
 const validateComment = (comment: CommentCreatePayload): string | null => {
 	switch (true) {
+		case !comment:
+		case JSON.stringify(comment) === '{}':
+			return "Comment is absent or empty";
 		case !comment.name:
-			return "Name is required";
+			return "Field `name` is absent";
 		case !comment.body:
-			return "Body is required";
+			return "Field `body` is absent";
 		case !comment.email:
-			return "Email is required";
+			return "Field `email` is absent";
 		case !comment.postId:
-			return "PostId is required";
+			return "Field `postId` is absent";
 		default:
 			return null;
 	}
