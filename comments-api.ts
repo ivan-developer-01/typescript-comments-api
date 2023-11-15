@@ -139,6 +139,32 @@ app.patch(PATH, async (
 	}
 });
 
+app.delete(`${PATH}/:id`, async (req: Request<{ id: string }>, res: Response) => {
+    const comments = await loadComments();
+    const id = req.params.id;
+
+    let removedComment: IComment | null = null;
+
+    const filteredComments = comments.filter((comment) => {
+        if (id === comment.id.toString()) {
+            removedComment = comment;
+            return false;
+        }
+
+        return true;
+    });
+
+    if (removedComment) {
+        await saveComments(filteredComments);
+        res.status(200);
+        res.send(removedComment);
+        return;
+    }
+
+    res.status(404);
+    res.send(`Comment with id ${id} is not found`);
+});
+
 const PORT = 3000;
 
 app.listen(PORT, () => {
