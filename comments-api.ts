@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { IComment, CommentCreatePayload } from "./types";
 import { readFile, writeFile } from "fs/promises";
-import { v4 } from 'uuid';
+import { v4 as uuidv4, v4 } from 'uuid';
 
 const app = express();
 
@@ -73,16 +73,16 @@ app.post(PATH, async (req: Request<{}, {}, CommentCreatePayload>, res: Response)
 
 	const id = v4();
 	// сохранить новый комментарий в файл
-	
+
 	const comments = await loadComments();
 
-    const isUniq = checkCommentUniq(req.body, comments);
+	const isUniq = checkCommentUniq(req.body, comments);
 
 	if (!isUniq) {
-        res.status(422);
-        res.send("Comment with the same fields already exists");
-        return;
-    }
+		res.status(422);
+		res.send("Comment with the same fields already exists");
+		return;
+	}
 
 	comments.push({ ...req.body, id });
 	await saveComments(comments);
@@ -103,6 +103,40 @@ app.get(`${PATH}/:id`, async (req: Request<{ id: string }>, res: Response) => {
 	}
 
 	res.send(comment);
+});
+
+app.patch(PATH, async (
+	req: Request<{}, {}, Partial<IComment>>,
+	res: Response
+) => {
+	const comments = await loadComments();
+	const newComment = req.body as CommentCreatePayload;
+    const validationResult = validateComment(newComment);
+
+    if (validationResult) {
+        res.status(400);
+        res.send(validationResult);
+        return;
+    }
+    
+    const id = uuidv4();
+    const commentToCreate = { ...newComment, id };
+    comments.push(commentToCreate);
+    await saveComments(comments);
+    
+    res.status(201);
+    res.send(commentToCreate);
+
+	const targetCommentIndex = comments.findIndex(({ id }) => req.body.id === id);
+
+	if (targetCommentIndex > -1) {
+		comments[targetCommentIndex] = { ...comments[targetCommentIndex], ...req.body }
+		await saveComments(comments);
+
+		res.status(200);
+		res.send(comments[targetCommentIndex]);
+		return;
+	}
 });
 
 const PORT = 3000;
